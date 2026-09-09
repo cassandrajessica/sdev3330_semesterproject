@@ -1,1 +1,2 @@
-# sdev3330_semesterproject
+# SDEV 3330 Initial README.md 
+
