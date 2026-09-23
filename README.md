@@ -31,8 +31,6 @@ A local event discovery app that helps users find things to do near them. Browse
 ```bash
 cd server
 npm install
-cp .env.example .env
-# Fill in your environment variables in .env
 npm run dev
 ```
 
