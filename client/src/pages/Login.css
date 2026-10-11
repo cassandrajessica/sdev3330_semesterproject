@@ -1,0 +1,159 @@
+.login-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Left panel */
+.login-left {
+  width: 40%;
+  padding: 48px 56px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white);
+}
+
+.login-logo {
+  font-family: 'Baskerville', 'Palatino Linotype', serif;
+  font-size: 1.25rem;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 64px;
+}
+
+.login-form-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.login-heading {
+  font-family: 'Baskerville', 'Palatino Linotype', serif;
+  font-size: 2.75rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-dark);
+  margin-bottom: 40px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1.5px solid var(--alabaster-grey);
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.login-input::placeholder {
+  color: var(--text-muted);
+}
+
+.login-input:focus {
+  border-color: var(--peach-glow);
+}
+
+.login-error {
+  font-size: 0.85rem;
+  color: #c0392b;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 16px;
+  background-color: var(--peach-glow);
+  border: none;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 4px;
+}
+
+.login-btn:hover {
+  background-color: var(--peach-fuzz);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--alabaster-grey);
+}
+
+.login-google {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.login-signup-link {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.login-signup-link a {
+  color: var(--text-dark);
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+/* Right panel */
+.login-right {
+  width: 60%;
+  overflow: hidden;
+}
+
+.login-hero-img {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  background-image: url('/hero-concert.webp');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-left {
+    width: 100%;
+    padding: 40px 24px;
+  }
+
+  .login-right {
+    display: none;
+  }
+}
