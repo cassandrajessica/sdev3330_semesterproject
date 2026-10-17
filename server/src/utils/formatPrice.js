@@ -15,7 +15,10 @@ export function formatPriceLabel({ price_min, price_max, currency }) {
   return formatAmount(price_min) + ' - ' + formatAmount(price_max);
 }
 
-// Formats one dollar amount, like 25 -> "$25".
+// Formats one dollar amount, like 25 -> "$25" and 49.5 -> "$49.50".
 function formatAmount(amount) {
-  return '$' + amount;
+  if (Number.isInteger(amount)) {
+    return '$' + amount;
+  }
+  return '$' + amount.toFixed(2);
 }
