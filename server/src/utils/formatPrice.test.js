@@ -19,4 +19,9 @@ describe('formatPriceLabel', () => {
   test('shows a single price when min and max are the same', () => {
     expect(formatPriceLabel({ price_min: 25, price_max: 25, currency: 'USD' })).toBe('$25');
   });
+
+  // Cycle 4: different min and max means a range of ticket prices.
+  test('shows a range when min and max are different', () => {
+    expect(formatPriceLabel({ price_min: 25, price_max: 60, currency: 'USD' })).toBe('$25 - $60');
+  });
 });
