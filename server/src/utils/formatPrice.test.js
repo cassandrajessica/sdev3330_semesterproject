@@ -9,4 +9,9 @@ describe('formatPriceLabel', () => {
   test('shows "Price TBA" when there is no price', () => {
     expect(formatPriceLabel({ price_min: null, price_max: null, currency: null })).toBe('Price TBA');
   });
+
+  // Cycle 2: a price of 0 means the event is free (this is why HW4 fixed price 0 being stored as null).
+  test('shows "Free" when the price is 0', () => {
+    expect(formatPriceLabel({ price_min: 0, price_max: 0, currency: 'USD' })).toBe('Free');
+  });
 });
