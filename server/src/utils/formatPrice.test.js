@@ -24,4 +24,9 @@ describe('formatPriceLabel', () => {
   test('shows a range when min and max are different', () => {
     expect(formatPriceLabel({ price_min: 25, price_max: 60, currency: 'USD' })).toBe('$25 - $60');
   });
+
+  // Cycle 5: Ticketmaster prices can have cents, like 49.5. Those should show two decimal places.
+  test('shows two decimal places when the price has cents', () => {
+    expect(formatPriceLabel({ price_min: 49.5, price_max: 89.99, currency: 'USD' })).toBe('$49.50 - $89.99');
+  });
 });
