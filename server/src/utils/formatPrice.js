@@ -1,7 +1,18 @@
 /**
  * Turn an event's raw price fields into the label shown on event cards.
+ *
+ *   no price      -> "Price TBA"
+ *   0             -> "Free"
+ *   25 and 25     -> "$25"
+ *   25 and 60     -> "$25 - $60"
+ *   49.5 and 60   -> "$49.50 - $60"
+ *
+ * @param {Object} event
+ * @param {number|null} event.price_min - Lowest ticket price
+ * @param {number|null} event.price_max - Highest ticket price
+ * @returns {string}
  */
-export function formatPriceLabel({ price_min, price_max, currency }) {
+export function formatPriceLabel({ price_min, price_max }) {
   // == null catches both null and undefined (no price data from Ticketmaster)
   if (price_min == null) {
     return 'Price TBA';
