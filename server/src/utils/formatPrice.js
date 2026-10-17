@@ -12,5 +12,5 @@ export function formatPriceLabel({ price_min, price_max, currency }) {
   if (price_min === price_max) {
     return '$' + price_min;
   }
-  return 'Price TBA';
+  return '$' + price_min + ' - $' + price_max;
 }
