@@ -14,4 +14,9 @@ describe('formatPriceLabel', () => {
   test('shows "Free" when the price is 0', () => {
     expect(formatPriceLabel({ price_min: 0, price_max: 0, currency: 'USD' })).toBe('Free');
   });
+
+  // Cycle 3: when min and max match, there is only one ticket price to show.
+  test('shows a single price when min and max are the same', () => {
+    expect(formatPriceLabel({ price_min: 25, price_max: 25, currency: 'USD' })).toBe('$25');
+  });
 });
