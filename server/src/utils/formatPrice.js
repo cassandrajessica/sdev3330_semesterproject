@@ -10,7 +10,12 @@ export function formatPriceLabel({ price_min, price_max, currency }) {
     return 'Free';
   }
   if (price_min === price_max) {
-    return '$' + price_min;
+    return formatAmount(price_min);
   }
-  return '$' + price_min + ' - $' + price_max;
+  return formatAmount(price_min) + ' - ' + formatAmount(price_max);
+}
+
+// Formats one dollar amount, like 25 -> "$25".
+function formatAmount(amount) {
+  return '$' + amount;
 }
