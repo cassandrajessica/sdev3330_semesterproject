@@ -11,6 +11,10 @@ const TM_BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
  * @param {string} [params.startDateTime]      - ISO 8601 datetime
  * @param {string} [params.endDateTime]        - ISO 8601 datetime
  * @param {string} [params.sort]               - e.g. "date,asc" or "relevance,desc"
+ * @param {string} [params.venueId]            - Ticketmaster venue ID
+ * @param {string} [params.geoPoint]           - Geohash of the search center
+ * @param {number} [params.radius]             - Search radius around geoPoint
+ * @param {string} [params.unit]               - "miles" or "km"
  * @param {number} [params.size]               - Results per page (max 200)
  * @param {number} [params.page]               - Page number
  * @returns {Promise<{events: Array, totalElements: number, totalPages: number, page: number}>}
@@ -30,6 +34,10 @@ export async function searchEvents(params = {}) {
   if (params.startDateTime)      query.set('startDateTime', params.startDateTime);
   if (params.endDateTime)        query.set('endDateTime', params.endDateTime);
   if (params.sort)               query.set('sort', params.sort);
+  if (params.venueId)            query.set('venueId', params.venueId);
+  if (params.geoPoint)           query.set('geoPoint', params.geoPoint);
+  if (params.radius)             query.set('radius', params.radius);
+  if (params.unit)               query.set('unit', params.unit);
 
   const url = `${TM_BASE_URL}/events.json?${query.toString()}`;
 
@@ -102,12 +110,21 @@ function formatEvent(raw) {
     currency: raw.priceRanges?.[0]?.currency || null,
     category: classification?.segment?.name || null,
     genre: classification?.genre?.name || null,
+    // Extra details shown in the event panel
+    please_note: raw.pleaseNote || null,
+    ticket_limit: raw.ticketLimit?.info || null,
+    age_restricted: raw.ageRestrictions?.legalAgeEnforced ?? null,
+    sales_start: raw.sales?.public?.startDateTime || null,
+    sales_end: raw.sales?.public?.endDateTime || null,
+    seatmap_url: raw.seatmap?.staticUrl || null,
+    promoter: raw.promoter?.name || null,
     venue: venue
       ? {
           name: venue.name,
           city: venue.city?.name || null,
           state: venue.state?.stateCode || null,
           address: venue.address?.line1 || null,
+          postal_code: venue.postalCode || null,
           latitude: venue.location?.latitude || null,
           longitude: venue.location?.longitude || null,
           ticketmaster_venue_id: venue.id,

@@ -1,0 +1,62 @@
+.cat-hero {
+  border-radius: var(--radius-lg);
+  padding: 32px 56px 40px;
+  background: var(--cat-color);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cat-hero__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+  text-decoration: none;
+  margin-bottom: 28px;
+}
+
+.cat-hero__back:hover {
+  text-decoration: underline;
+}
+
+.cat-hero h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+  line-height: 1.1;
+}
+
+.cat-hero p {
+  font-size: 1rem;
+  max-width: 46ch;
+}
+
+.cat-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.cat-switcher .chip {
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.7);
+  border-color: transparent;
+}
+
+.cat-switcher .chip.is-active {
+  background: var(--text-dark);
+  color: var(--white);
+}
+
+@media (max-width: 640px) {
+  .cat-hero {
+    padding: 24px;
+  }
+}
