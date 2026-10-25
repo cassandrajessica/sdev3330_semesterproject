@@ -1,5 +1,26 @@
 const TM_BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
 
+// Stop waiting for Ticketmaster after this many ms so a slow API can't hang a request.
+const DEFAULT_TIMEOUT_MS = 8000;
+
+function getTimeoutMs() {
+  const fromEnv = Number(process.env.TICKETMASTER_TIMEOUT_MS);
+  return fromEnv > 0 ? fromEnv : DEFAULT_TIMEOUT_MS;
+}
+
+// fetch with a time limit. Throws a clear error on a timeout or network failure.
+async function fetchWithTimeout(url) {
+  const timeoutMs = getTimeoutMs();
+  try {
+    return await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+  } catch (err) {
+    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+      throw new Error(`Ticketmaster API timed out after ${timeoutMs} ms`);
+    }
+    throw new Error(`Ticketmaster API request failed: ${err.message}`);
+  }
+}
+
 /**
  * Search events from the Ticketmaster Discovery API.
  *
@@ -41,7 +62,7 @@ export async function searchEvents(params = {}) {
 
   const url = `${TM_BASE_URL}/events.json?${query.toString()}`;
 
-  const response = await fetch(url);
+  const response = await fetchWithTimeout(url);
 
   if (!response.ok) {
     const errorBody = await response.text();
@@ -71,7 +92,7 @@ export async function searchEvents(params = {}) {
 export async function getEventById(eventId) {
   const url = `${TM_BASE_URL}/events/${eventId}.json?apikey=${process.env.TICKETMASTER_API_KEY}`;
 
-  const response = await fetch(url);
+  const response = await fetchWithTimeout(url);
 
   if (!response.ok) {
     const errorBody = await response.text();
