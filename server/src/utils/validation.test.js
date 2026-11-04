@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals';
-import { validateRegistration } from './validation.js';
+import { validateRegistration, validateEventIds } from './validation.js';
 
 describe('validateRegistration', () => {
 
@@ -57,4 +57,54 @@ describe('validateRegistration', () => {
     expect(result.errors).toHaveLength(0);
   });
 
+});
+
+describe('validateEventIds', () => {
+
+  // ── Test 1: EP – Valid list (valid partition) ──
+  test('accepts a list of positive whole numbers', () => {
+    const result = validateEventIds([1, 7, 42]);
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  // ── Test 2: EP – Not an array (invalid partition) ──
+  test('rejects a value that is not an array', () => {
+    const result = validateEventIds('12');
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('eventIds must be a non-empty array');
+  });
+
+  // ── Test 3: BVA – Empty list (just below the minimum of 1) ──
+  test('rejects an empty list', () => {
+    const result = validateEventIds([]);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('eventIds must be a non-empty array');
+  });
+
+  // ── Test 4: BVA – Exactly 200 ids (at the maximum) ──
+  test('accepts exactly 200 ids', () => {
+    const ids = Array.from({ length: 200 }, (_, i) => i + 1);
+    expect(validateEventIds(ids).valid).toBe(true);
+  });
+
+  // ── Test 5: BVA – 201 ids (just above the maximum) ──
+  test('rejects 201 ids', () => {
+    const ids = Array.from({ length: 201 }, (_, i) => i + 1);
+    const result = validateEventIds(ids);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('eventIds must contain 200 ids or fewer');
+  });
+
+  // ── Test 6: BVA – Id of 0 (just below the lowest valid id) ──
+  test('rejects an id of 0', () => {
+    const result = validateEventIds([0]);
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('eventIds must only contain positive whole numbers');
+  });
+
+  // ── Test 7: EP – Ids that are not whole numbers (invalid partition) ──
+  test.each([[[1.5]], [['3']], [[null]], [[-2]]])('rejects %j', (ids) => {
+    expect(validateEventIds(ids).valid).toBe(false);
+  });
 });

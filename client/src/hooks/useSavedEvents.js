@@ -89,7 +89,22 @@ export default function useSavedEvents() {
   const upcoming = useMemo(() => saved.filter((e) => !isPast(e.start_date)), [saved]);
   const past = useMemo(() => saved.filter((e) => isPast(e.start_date)), [saved]);
 
-  return { user, loading, upcoming, past, isSaved, toggleSave, removeSaved, signOut };
+  // Removes several saved events at once. `eventIds` are our database ids, the same
+  // ones removeSaved uses. The caller decides which events count as past.
+  const clearPast = useCallback(
+    async (eventIds) => {
+      if (!eventIds.length) return;
+      try {
+        await apiFetch('/api/events/saved', { method: 'DELETE', body: JSON.stringify({ eventIds }) });
+        await refresh();
+      } catch (err) {
+        handleAuthError(err);
+      }
+    },
+    [refresh, handleAuthError]
+  );
+
+  return { user, loading, upcoming, past, isSaved, toggleSave, removeSaved, clearPast, signOut };
 }
 
 // Returns a heart-button handler that sends signed-out visitors to the login page.

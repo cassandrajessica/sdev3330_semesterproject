@@ -5,6 +5,8 @@ import apiRoutes from './routes/api.js';
 import eventRoutes from './routes/events.js';
 import authRoutes from './routes/auth.js';
 import savedRoutes from './routes/saved.js';
+import pool from './db.js';
+import { startCleanupSchedule } from './services/cleanup.js';
 
 dotenv.config();
 
@@ -24,4 +26,5 @@ app.use('/api/events', eventRoutes);
 // Start server
 app.listen(PORT, () => {
   console.log(`HeyCiti server running on port ${PORT}`);
+  startCleanupSchedule(pool); // removes old saved events now and then every 24 hours
 });

@@ -85,19 +85,41 @@ function SavedSections({ saved, keyword, onToggleSave }) {
         onToggleSave={onToggleSave}
         isSaved={saved.isSaved}
         muted
+        note="Past events are removed automatically about 30 days after the event date."
+        onClear={saved.clearPast}
       />
     </>
   );
 }
 
-function SavedSection({ id, title, rows, loading, emptyText, onOpen, onToggleSave, isSaved, muted }) {
+function SavedSection({ id, title, rows, loading, emptyText, onOpen, onToggleSave, isSaved, muted, note, onClear }) {
+  const [confirming, setConfirming] = useState(false);
+
+  async function handleConfirm() {
+    await onClear(rows.map((row) => row.id));
+    setConfirming(false);
+  }
+
   return (
     <section className="dash-section" id={id}>
-      <div className="dash-section__head">
+      <div className="dash-section__head saved-head">
         <h2 className="dash-heading">
           {title} <span className="saved-count">{rows.length}</span>
         </h2>
+
+        {onClear && rows.length > 0 &&
+          (confirming ? (
+            <div className="saved-confirm" role="group" aria-label="Confirm clearing past events">
+              <span>Remove {rows.length} past {rows.length === 1 ? 'event' : 'events'}?</span>
+              <button type="button" className="chip is-active" onClick={handleConfirm}>Yes, clear</button>
+              <button type="button" className="chip" onClick={() => setConfirming(false)}>Cancel</button>
+            </div>
+          ) : (
+            <button type="button" className="chip" onClick={() => setConfirming(true)}>Clear past events</button>
+          ))}
       </div>
+
+      {note && <p className="saved-note">{note}</p>}
 
       {loading && rows.length === 0 ? (
         <p className="dash-empty">Loading...</p>

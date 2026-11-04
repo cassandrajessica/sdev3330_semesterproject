@@ -28,6 +28,12 @@ A local event discovery app that helps users find things to do near them. Browse
 - `GET /api/events/search` - Search events via Ticketmaster (supports keyword, city, stateCode, classificationName, startDateTime, endDateTime, sort, size, page)
 - `GET /api/events/:id` - Get a single event's details by Ticketmaster ID
 
+### Saved Events (sign-in required)
+- `POST /api/events/saved` - Save an event
+- `GET /api/events/saved` - List the signed-in user's saved events
+- `DELETE /api/events/saved/:eventId` - Unsave one event
+- `DELETE /api/events/saved` - Unsave several events at once (JSON body: `{ "eventIds": [12, 15] }`)
+
 ### Auth
 - `POST /api/auth/register` - Create a new account (email + password)
 - `POST /api/auth/login` - Log in and receive a JWT token
@@ -74,6 +80,16 @@ DATABASE_URL=your_supabase_connection_string
 TICKETMASTER_API_KEY=your_ticketmaster_key
 JWT_SECRET=your_secret_key
 ```
+
+Optional setting:
+
+```
+CLEANUP_RETENTION_DAYS=30
+```
+
+### Automatic cleanup
+
+When the server starts, and then every 24 hours, it removes saved events whose event date is more than `CLEANUP_RETENTION_DAYS` days ago (30 by default). It also removes past events that no user has saved anymore and venues that no event uses. Users can also clear their own past events from the Saved Events page.
 
 Start the development server:
 
