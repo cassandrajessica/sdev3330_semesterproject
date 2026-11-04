@@ -1,7 +1,7 @@
 /**
  * Turn an event's raw price fields into the label shown on event cards.
  *
- *   no price      -> "Price TBA"
+ *   no price      -> "See Price on Official Seller"
  *   0             -> "Free"
  *   25 and 25     -> "$25"
  *   25 and 60     -> "$25 - $60"
@@ -13,9 +13,10 @@
  * @returns {string}
  */
 export function formatPriceLabel({ price_min, price_max }) {
-  // == null catches both null and undefined (no price data from Ticketmaster)
+  // == null catches both null and undefined. Ticketmaster removed priceRanges from its
+  // Discovery data in 2025, so most events have no price and we point to the official seller.
   if (price_min == null) {
-    return 'Price TBA';
+    return 'See Price on Official Seller';
   }
   if (price_min === 0) {
     return 'Free';

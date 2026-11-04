@@ -34,7 +34,7 @@ router.get('/search', async (req, res) => {
       page: req.query.page,
     });
 
-    // Add the display label for event cards ("Free", "$25 - $60", "Price TBA")
+    // Add the display label for event cards ("Free", "$25 - $60", "See Price on Official Seller")
     res.json({
       ...results,
       events: results.events.map((e) => ({ ...e, price_label: formatPriceLabel(e) })),
