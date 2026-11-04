@@ -24,6 +24,24 @@ export function validateRegistration({ email, password }) {
   }
 
   // --- Password checks ---
+  errors.push(...validatePassword(password));
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Check a password against the HeyCiti password rules.
+ * Used by registration and by password reset so both follow the same rules.
+ *
+ * @param {string} password
+ * @returns {string[]} A list of problems, empty when the password is fine.
+ */
+export function validatePassword(password) {
+  const errors = [];
+
   if (!password || typeof password !== 'string') {
     errors.push('Password is required');
   } else {
@@ -41,8 +59,5 @@ export function validateRegistration({ email, password }) {
     }
   }
 
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
+  return errors;
 }
