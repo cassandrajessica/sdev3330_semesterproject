@@ -168,11 +168,15 @@
   margin-top: 10px;
 }
 
+/* Two events are visible (2 x 70px + one 10px gap); the list scrolls to reveal up to five. */
 .drawer-list {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .drawer-list.is-muted .drawer-item img,
@@ -182,6 +186,8 @@
 }
 
 .drawer-item {
+  flex: none;
+  height: 70px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -205,6 +211,8 @@
   align-items: center;
   gap: 12px;
   padding: 6px;
+  height: 100%;
+  box-sizing: border-box;
   color: inherit;
   text-decoration: none;
 }
@@ -221,6 +229,8 @@
 
 .drawer-item__text {
   min-width: 0;
+  max-height: 58px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -259,6 +269,21 @@
 .drawer-item__remove:hover {
   background: var(--linen);
   color: var(--text-dark);
+}
+
+.drawer-seeall {
+  margin-left: auto;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.drawer-seeall--bottom {
+  display: inline-block;
+  margin-top: 12px;
 }
 
 .drawer-cats {

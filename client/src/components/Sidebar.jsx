@@ -6,7 +6,7 @@ import { CATEGORIES } from '../utils/categories.js';
 import { savedRowToEvent } from '../utils/events.js';
 import './Sidebar.css';
 
-const PREVIEW_COUNT = 4;
+const PREVIEW_COUNT = 5;
 
 // The slim rail on the left edge of the page. Clicking the panel icon (or any
 // rail icon) slides open the drawer with saved events, past events and categories.
@@ -97,6 +97,8 @@ function Sidebar({ open, section, onOpen, onClose, user, upcoming, past, loading
               emptyText="Tap the heart on any event to save it for later."
               onRemove={onRemove}
               onOpenEvent={onOpenEvent}
+              onNavigate={onClose}
+              seeAllTo="/saved"
             />
             <DrawerList
               id="past"
@@ -106,6 +108,8 @@ function Sidebar({ open, section, onOpen, onClose, user, upcoming, past, loading
               emptyText="Saved events move here after their date passes."
               onRemove={onRemove}
               onOpenEvent={onOpenEvent}
+              onNavigate={onClose}
+              seeAllTo="/saved#past"
               muted
             />
           </>
@@ -135,15 +139,19 @@ function Sidebar({ open, section, onOpen, onClose, user, upcoming, past, loading
   );
 }
 
-// A short preview list of saved events, with a count of how many more there are.
-function DrawerList({ id, title, items, loading, emptyText, onRemove, onOpenEvent, muted }) {
+// A short, scrollable preview of saved events. Two events fit on screen, the
+// list scrolls to show up to five, and "See all events" opens the full page.
+function DrawerList({ id, title, items, loading, emptyText, onRemove, onOpenEvent, onNavigate, seeAllTo, muted }) {
   const preview = items.slice(0, PREVIEW_COUNT);
-  const extra = items.length - preview.length;
+  const hasMore = items.length > PREVIEW_COUNT;
 
   return (
     <section className="drawer-section" id={`drawer-${id}`}>
       <h3 className="drawer-section__title">
         {title} <span className="drawer-section__count">{items.length}</span>
+        {items.length > 0 && (
+          <Link to={seeAllTo} className="drawer-seeall" onClick={onNavigate}>See all events</Link>
+        )}
       </h3>
 
       {loading && items.length === 0 ? (
@@ -169,7 +177,9 @@ function DrawerList({ id, title, items, loading, emptyText, onRemove, onOpenEven
           ))}
         </ul>
       )}
-      {extra > 0 && <p className="drawer-more">+ {extra} more</p>}
+      {hasMore && (
+        <Link to={seeAllTo} className="drawer-seeall drawer-seeall--bottom" onClick={onNavigate}>See all events</Link>
+      )}
     </section>
   );
 }
