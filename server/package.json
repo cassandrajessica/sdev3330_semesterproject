@@ -8,6 +8,11 @@
     "dev": "nodemon src/index.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
+  "jest": {
+    "setupFiles": [
+      "./jest.setup.js"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
