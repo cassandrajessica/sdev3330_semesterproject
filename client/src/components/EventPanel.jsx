@@ -157,7 +157,7 @@ function EventPanel({ event, onClose, isSaved, onToggleSave }) {
                   <ExternalIcon width={16} height={16} />
                 </a>
               )}
-              <p className="ev-small ev-muted">Tickets are sold on Ticketmaster.</p>
+              <p className="ev-small ev-muted">Ticket sales and pricing are handled by the official seller.</p>
 
               <button type="button" className={`ev-save ${saved ? 'is-saved' : ''}`} onClick={() => onToggleSave(e)} aria-pressed={saved}>
                 <HeartIcon filled={saved} width={18} height={18} />
