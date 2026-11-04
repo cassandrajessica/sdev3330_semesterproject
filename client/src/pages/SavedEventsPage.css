@@ -1,0 +1,65 @@
+.saved-hero {
+  border-radius: var(--radius-lg);
+  padding: 32px 56px 40px;
+  background: var(--powder-petal);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.saved-hero__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+  text-decoration: none;
+  margin-bottom: 28px;
+}
+
+.saved-hero__back:hover {
+  text-decoration: underline;
+}
+
+.saved-hero h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+  line-height: 1.1;
+}
+
+.saved-hero p {
+  font-size: 1rem;
+  max-width: 46ch;
+}
+
+.saved-filter {
+  margin-top: 20px;
+}
+
+.saved-count {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--linen);
+  vertical-align: middle;
+}
+
+/* Past events look slightly faded, like the Past list in the drawer. */
+.event-grid.is-past .event-card__media img,
+.event-grid.is-past .event-card__placeholder {
+  filter: grayscale(0.8);
+  opacity: 0.75;
+}
+
+@media (max-width: 640px) {
+  .saved-hero {
+    padding: 24px 24px 32px;
+  }
+}

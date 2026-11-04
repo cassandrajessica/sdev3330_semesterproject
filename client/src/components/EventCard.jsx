@@ -29,7 +29,7 @@ function EventCard({ event, saved, onToggleSave, onOpen, size = 'wide' }) {
           <h3 className="event-card__title">{event.name}</h3>
           <p className="event-card__meta">{formatEventDate(event.start_date, event.start_time)}</p>
           {place && <p className="event-card__meta">{place}</p>}
-          <p className="event-card__price">{event.price_label}</p>
+          {event.price_label && <p className="event-card__price">{event.price_label}</p>}
         </div>
       </button>
 
