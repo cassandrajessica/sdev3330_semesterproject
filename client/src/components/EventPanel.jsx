@@ -146,7 +146,7 @@ function EventPanel({ event, onClose, isSaved, onToggleSave }) {
           <div className="ev-side">
             <div className="ev-card">
               <span className="ev-card__label">Tickets</span>
-              <strong className="ev-price">{e.price_label || (details ? 'Price TBA' : ' ')}</strong>
+              <strong className="ev-price">{e.price_label || (details ? 'See Price on Official Seller' : ' ')}</strong>
               {salesUpcoming && saleStart && <p className="ev-small">On sale {saleStart}</p>}
               {!salesUpcoming && saleEnd && <p className="ev-small">Sales end {saleEnd}</p>}
 
