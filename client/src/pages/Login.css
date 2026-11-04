@@ -68,6 +68,26 @@
   color: #c0392b;
 }
 
+.login-forgot {
+  align-self: flex-end;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+
+.login-forgot:hover {
+  color: var(--text-dark);
+}
+
+.login-success {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-dark);
+  background-color: var(--alabaster-grey);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
 .login-btn {
   width: 100%;
   padding: 16px;
