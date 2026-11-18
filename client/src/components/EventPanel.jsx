@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CalendarIcon, CloseIcon, ExternalIcon, HeartIcon, PinIcon, TicketIcon } from './Icons.jsx';
 import { apiFetch } from '../api.js';
 import { formatEventDate } from '../utils/dates.js';
-import { directionsUrl } from '../utils/events.js';
+import { directionsUrl, panelLabel } from '../utils/events.js';
 import './EventPanel.css';
 
 // Ticketmaster status codes that need a warning instead of a normal ticket button
@@ -72,7 +72,7 @@ function EventPanel({ event, onClose, isSaved, onToggleSave }) {
   const v = e.venue;
   const statusNote = STATUS_NOTES[e.status];
   const saved = isSaved(e.ticketmaster_id);
-  const label = e.genre && e.genre !== 'Undefined' ? `${e.category} · ${e.genre}` : e.category;
+  const label = panelLabel(e);
   const mapsUrl = directionsUrl(v);
   const saleStart = formatSaleDate(e.sales_start);
   const saleEnd = formatSaleDate(e.sales_end);

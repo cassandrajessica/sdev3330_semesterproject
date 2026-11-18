@@ -197,6 +197,12 @@ export async function getEventById(eventId) {
   return formatEvent(data);
 }
 
+// Ticketmaster fills in a missing category or genre with the word "Undefined".
+// Treat that the same as no value so it never shows up as a label.
+export function cleanClassification(name) {
+  return name && name !== 'Undefined' ? name : null;
+}
+
 /**
  * Map a raw Ticketmaster event object into a cleaner shape
  * for the HeyCiti frontend.
@@ -223,8 +229,8 @@ function formatEvent(raw) {
     price_min: raw.priceRanges?.[0]?.min ?? null,
     price_max: raw.priceRanges?.[0]?.max ?? null,
     currency: raw.priceRanges?.[0]?.currency || null,
-    category: classification?.segment?.name || null,
-    genre: classification?.genre?.name || null,
+    category: cleanClassification(classification?.segment?.name),
+    genre: cleanClassification(classification?.genre?.name),
     // Extra details shown in the event panel
     please_note: raw.pleaseNote || null,
     ticket_limit: raw.ticketLimit?.info || null,

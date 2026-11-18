@@ -1,5 +1,5 @@
 // Base URL for the HeyCiti backend. Set VITE_API_URL in client/.env when
-// the server is deployed (for example on Render); locally it falls back to port 3000.
+// the server is deployed (for example on Railway); locally it falls back to port 3000.
 export const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export function getToken() {
