@@ -31,6 +31,8 @@ A local event discovery app that helps users find things to do near them. Browse
 ### Auth
 - `POST /api/auth/register` - Create a new account (email + password)
 - `POST /api/auth/login` - Log in and receive a JWT token
+- `POST /api/auth/forgot-password` - Email a password reset link (same response whether or not the email has an account)
+- `POST /api/auth/reset-password` - Set a new password using the token from the reset email
 
 ## Project Structure
 
@@ -75,11 +77,30 @@ TICKETMASTER_API_KEY=your_ticketmaster_key
 JWT_SECRET=your_secret_key
 ```
 
+Optional, for password reset emails:
+
+```
+CLIENT_URL=http://localhost:5173
+RESEND_API_KEY=your_resend_key
+EMAIL_FROM=HeyCiti <noreply@yourdomain.com>
+```
+
+Without `RESEND_API_KEY`, the reset link is printed in the server terminal instead of emailed. Without `EMAIL_FROM`, emails come from Resend's test sender, which only delivers to your own Resend account email until your domain is verified. Run `server/migrations/001_password_reset_tokens.sql` once in the Supabase SQL editor to create the table.
+
 Start the development server:
 
 ```bash
 npm run dev
 ```
+
+## Feature Flags
+
+Flags are environment variables in `server/.env`. Anything other than `true` counts as off.
+
+| Flag | Default | What it does |
+|---|---|---|
+| `FEATURE_EVENT_CACHE` | off | Reuses identical Ticketmaster search results for 5 minutes instead of calling the API again. Work in progress: no size limit or cleanup yet. |
+| `FEATURE_ONBOARDING` | off | Onboarding step where new users pick preferred categories. Work in progress: preferences are validated but not saved, no UI yet. |
 
 ## License
 

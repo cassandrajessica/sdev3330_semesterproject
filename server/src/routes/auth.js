@@ -4,6 +4,9 @@ import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import pool from '../db.js';
 import { validateRegistration } from '../utils/validation.js';
+import { createRateLimiter } from '../utils/rateLimit.js';
+import { requestPasswordReset, resetPassword } from '../services/passwordReset.js';
+import { sendPasswordResetEmail } from '../services/email.js';
 
 const router = express.Router();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -159,6 +162,71 @@ router.post('/google', async (req, res) => {
   } catch (err) {
     console.error('Google auth error:', err.message);
     res.status(401).json({ error: 'Invalid Google credential' });
+  }
+});
+
+// Password reset limits: 5 reset emails and 10 reset attempts per IP address every 15 minutes.
+const forgotLimiter = createRateLimiter({ max: 5, windowMs: 15 * 60 * 1000 });
+const resetLimiter = createRateLimiter({ max: 10, windowMs: 15 * 60 * 1000 });
+
+function tooManyRequests(res, retryAfterMs) {
+  res.set('Retry-After', String(Math.ceil(retryAfterMs / 1000)));
+  return res.status(429).json({ error: 'Too many attempts. Please try again in a few minutes.' });
+}
+
+// POST /api/auth/forgot-password
+// Always answers the same way whether or not the email has an account.
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || typeof email !== 'string') {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  const limit = forgotLimiter.check(req.ip);
+  if (!limit.allowed) {
+    return tooManyRequests(res, limit.retryAfterMs);
+  }
+
+  try {
+    const result = await requestPasswordReset(pool, email, {
+      sendEmail: sendPasswordResetEmail,
+      clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+    });
+
+    // Same hint the login form already gives for Google accounts.
+    if (result.googleOnly) {
+      return res.json({
+        googleOnly: true,
+        message: 'This account signs in with Google. Use "Sign in with Google" on the sign in page.',
+      });
+    }
+  } catch (err) {
+    // Logged, but the user still gets the normal answer so errors cannot reveal which emails exist.
+    console.error('Forgot password error:', err.message);
+  }
+
+  res.json({ message: 'If an account exists for that email, we sent a password reset link.' });
+});
+
+// POST /api/auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+
+  const limit = resetLimiter.check(req.ip);
+  if (!limit.allowed) {
+    return tooManyRequests(res, limit.retryAfterMs);
+  }
+
+  try {
+    const result = await resetPassword(pool, token, password);
+    if (!result.ok) {
+      return res.status(result.status).json({ error: result.errors });
+    }
+    res.json({ message: 'Password updated. You can now sign in.' });
+  } catch (err) {
+    console.error('Reset password error:', err.message);
+    res.status(500).json({ error: 'Something went wrong while resetting your password' });
   }
 });
 

@@ -99,6 +99,22 @@ export function resetRateLimiter() {
   inFlight.clear();
 }
 
+// Feature flag: set FEATURE_EVENT_CACHE=true to reuse identical search results
+// for a few minutes instead of calling Ticketmaster every time. Off by default.
+// Still unfinished, which is why it stays off: there is no size limit, expired
+// entries are never cleaned up, and getEventById is not cached yet.
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const searchCache = new Map();
+
+function isEventCacheEnabled() {
+  return process.env.FEATURE_EVENT_CACHE === 'true';
+}
+
+// Empties the search cache. Used by tests so each one starts fresh.
+export function clearEventCache() {
+  searchCache.clear();
+}
+
 /**
  * Search events from the Ticketmaster Discovery API.
  *
@@ -140,18 +156,32 @@ export async function searchEvents(params = {}) {
 
   const url = `${TM_BASE_URL}/events.json?${query.toString()}`;
 
+  const useCache = isEventCacheEnabled();
+  if (useCache) {
+    const cached = searchCache.get(url);
+    if (cached && Date.now() - cached.savedAt < CACHE_TTL_MS) {
+      return cached.result;
+    }
+  }
+
   const data = await fetchJson(url);
 
   // Ticketmaster returns _embedded.events when there are results,
   // or no _embedded at all when there are none.
   const rawEvents = data._embedded?.events || [];
 
-  return {
+  const result = {
     events: rawEvents.map(formatEvent),
     totalElements: data.page?.totalElements || 0,
     totalPages: data.page?.totalPages || 0,
     page: data.page?.number || 0,
   };
+
+  if (useCache) {
+    searchCache.set(url, { result, savedAt: Date.now() });
+  }
+
+  return result;
 }
 
 /**
