@@ -59,3 +59,19 @@ export function directionsUrl(venue) {
       : [venue.name, venue.address, venue.city, venue.state].filter(Boolean).join(', ');
   return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : null;
 }
+
+// Ticketmaster uses the word "Undefined" for a missing category or genre, and
+// some saved events still have it stored. Returns the labels worth showing.
+function usable(name) {
+  return name && name !== 'Undefined' ? name : null;
+}
+
+// Card label: the genre when there is one, otherwise the category.
+export function cardLabel(event) {
+  return usable(event.genre) || usable(event.category);
+}
+
+// Panel label: category and genre together, e.g. "Music · Rock".
+export function panelLabel(event) {
+  return [usable(event.category), usable(event.genre)].filter(Boolean).join(' · ') || null;
+}

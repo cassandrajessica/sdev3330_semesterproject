@@ -1,11 +1,13 @@
 import { HeartIcon } from './Icons.jsx';
 import { dateBadge, formatEventDate } from '../utils/dates.js';
+import { cardLabel } from '../utils/events.js';
 
 // One event tile. Clicking the card opens the event; the heart saves it.
 // `size` is "wide" for the Events In City grid and "tall" for carousels.
 function EventCard({ event, saved, onToggleSave, onOpen, size = 'wide' }) {
   const badge = dateBadge(event.start_date);
   const place = [event.venue?.name, event.venue?.city].filter(Boolean).join(', ');
+  const label = cardLabel(event);
 
   return (
     <article className={`event-card event-card--${size}`}>
@@ -25,7 +27,7 @@ function EventCard({ event, saved, onToggleSave, onOpen, size = 'wide' }) {
         </div>
 
         <div className="event-card__body">
-          {event.category && <span className="event-card__category">{event.genre && event.genre !== 'Undefined' ? event.genre : event.category}</span>}
+          {label && <span className="event-card__category">{label}</span>}
           <h3 className="event-card__title">{event.name}</h3>
           <p className="event-card__meta">{formatEventDate(event.start_date, event.start_time)}</p>
           {place && <p className="event-card__meta">{place}</p>}
