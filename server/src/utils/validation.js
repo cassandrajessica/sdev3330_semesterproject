@@ -61,3 +61,31 @@ export function validatePassword(password) {
 
   return errors;
 }
+
+const MAX_EVENT_IDS = 200;
+
+/**
+ * Validate the list of event ids sent to the bulk unsave endpoint.
+ *
+ * @param {*} eventIds - Expected to be an array of positive whole numbers
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateEventIds(eventIds) {
+  const errors = [];
+
+  if (!Array.isArray(eventIds) || eventIds.length === 0) {
+    errors.push('eventIds must be a non-empty array');
+  } else {
+    if (eventIds.length > MAX_EVENT_IDS) {
+      errors.push(`eventIds must contain ${MAX_EVENT_IDS} ids or fewer`);
+    }
+    if (!eventIds.every((id) => Number.isInteger(id) && id > 0)) {
+      errors.push('eventIds must only contain positive whole numbers');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}

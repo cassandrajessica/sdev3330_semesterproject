@@ -51,6 +51,28 @@
   vertical-align: middle;
 }
 
+.saved-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.saved-confirm {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.saved-note {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin: -4px 0 16px;
+}
+
 /* Past events look slightly faded, like the Past list in the drawer. */
 .event-grid.is-past .event-card__media img,
 .event-grid.is-past .event-card__placeholder {

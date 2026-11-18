@@ -28,6 +28,12 @@ A local event discovery app that helps users find things to do near them. Browse
 - `GET /api/events/search` - Search events via Ticketmaster (supports keyword, city, stateCode, classificationName, startDateTime, endDateTime, sort, size, page)
 - `GET /api/events/:id` - Get a single event's details by Ticketmaster ID
 
+### Saved Events (sign-in required)
+- `POST /api/events/saved` - Save an event
+- `GET /api/events/saved` - List the signed-in user's saved events
+- `DELETE /api/events/saved/:eventId` - Unsave one event
+- `DELETE /api/events/saved` - Unsave several events at once (JSON body: `{ "eventIds": [12, 15] }`)
+
 ### Auth
 - `POST /api/auth/register` - Create a new account (email + password)
 - `POST /api/auth/login` - Log in and receive a JWT token
@@ -86,6 +92,16 @@ EMAIL_FROM=HeyCiti <noreply@yourdomain.com>
 ```
 
 Without `RESEND_API_KEY`, the reset link is printed in the server terminal instead of emailed. Without `EMAIL_FROM`, emails come from Resend's test sender, which only delivers to your own Resend account email until your domain is verified. Run `server/migrations/001_password_reset_tokens.sql` once in the Supabase SQL editor to create the table.
+
+Optional setting:
+
+```
+CLEANUP_RETENTION_DAYS=30
+```
+
+### Automatic cleanup
+
+When the server starts, and then every 24 hours, it removes saved events whose event date is more than `CLEANUP_RETENTION_DAYS` days ago (30 by default). It also removes past events that no user has saved anymore and venues that no event uses. Users can also clear their own past events from the Saved Events page.
 
 Start the development server:
 

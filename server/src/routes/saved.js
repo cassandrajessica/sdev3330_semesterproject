@@ -1,6 +1,7 @@
 import express from 'express';
 import pool from '../db.js';
 import { authenticateToken } from '../middleware/auth.js';
+import { validateEventIds } from '../utils/validation.js';
 
 const router = express.Router();
 
@@ -121,6 +122,30 @@ router.get('/', async (req, res) => {
   } catch (err) {
     console.error('Get saved events error:', err.message);
     res.status(500).json({ error: 'Failed to retrieve saved events' });
+  }
+});
+
+// DELETE /api/events/saved — Unsave several events at once. Body: { "eventIds": [12, 15] }
+// Only the signed-in user's own saved events are removed.
+router.delete('/', async (req, res) => {
+  const userId = req.user.id;
+  const eventIds = req.body?.eventIds;
+
+  const { valid, errors } = validateEventIds(eventIds);
+  if (!valid) {
+    return res.status(400).json({ error: errors });
+  }
+
+  try {
+    const result = await pool.query(
+      'DELETE FROM saved_events WHERE user_id = $1 AND event_id = ANY($2::int[])',
+      [userId, eventIds]
+    );
+
+    res.json({ message: 'Events unsaved', removed: result.rowCount });
+  } catch (err) {
+    console.error('Bulk unsave error:', err.message);
+    res.status(500).json({ error: 'Failed to unsave events' });
   }
 });
 
