@@ -32,7 +32,7 @@ function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       navigate('/dashboard');
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
@@ -60,7 +60,7 @@ function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       navigate('/dashboard');
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
@@ -93,6 +93,8 @@ function Login() {
               className="login-input"
               required
             />
+
+            <Link to="/forgot-password" className="login-forgot">Forgot password?</Link>
 
             {error && <p className="login-error">{error}</p>}
 
