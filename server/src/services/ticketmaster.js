@@ -21,6 +21,84 @@ async function fetchWithTimeout(url) {
   }
 }
 
+// ── Rate limiting ──
+// Ticketmaster allows about 5 requests per second with almost no burst, and answers
+// 429 "Spike arrest violation" when requests arrive too close together. The dashboard
+// sends several searches at once, so every outgoing request waits for its turn.
+const DEFAULT_MIN_INTERVAL_MS = 250;
+const MAX_RETRIES = 2;
+const DEFAULT_RETRY_DELAY_MS = 500;
+const MAX_RETRY_DELAY_MS = 5000;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+let nextSlotAt = 0; // earliest time the next request may start
+const inFlight = new Map(); // url -> promise for requests that are still running
+
+// Minimum gap between requests. TICKETMASTER_MIN_INTERVAL_MS can change it (0 turns spacing off).
+function getMinIntervalMs() {
+  const raw = process.env.TICKETMASTER_MIN_INTERVAL_MS;
+  if (raw === undefined || raw === '') return DEFAULT_MIN_INTERVAL_MS;
+  const fromEnv = Number(raw);
+  return fromEnv >= 0 ? fromEnv : DEFAULT_MIN_INTERVAL_MS;
+}
+
+// Reserves the next free slot right away, so requests that arrive together
+// line up one after another instead of all waiting for the same moment.
+function waitForTurn() {
+  const now = Date.now();
+  const startAt = Math.max(now, nextSlotAt);
+  nextSlotAt = startAt + getMinIntervalMs();
+  return startAt > now ? sleep(startAt - now) : Promise.resolve();
+}
+
+// How long to wait before retrying a 429: the Retry-After header (in seconds) when
+// Ticketmaster sends one, otherwise a short delay that grows with each attempt.
+function getRetryDelayMs(response, attempt) {
+  const header = response.headers?.get('retry-after');
+  const seconds = header == null || header === '' ? NaN : Number(header);
+  const delay = Number.isFinite(seconds) && seconds >= 0 ? seconds * 1000 : DEFAULT_RETRY_DELAY_MS * (attempt + 1);
+  return Math.min(delay, MAX_RETRY_DELAY_MS);
+}
+
+// Sends the request in its turn and retries a 429 up to MAX_RETRIES times.
+// Any other response, including other errors, is returned as it is.
+async function fetchWithRetry(url) {
+  for (let attempt = 0; ; attempt++) {
+    await waitForTurn();
+    const response = await fetchWithTimeout(url);
+    if (response.status !== 429 || attempt >= MAX_RETRIES) return response;
+    await sleep(getRetryDelayMs(response, attempt));
+  }
+}
+
+// Fetches and parses one Ticketmaster URL. Identical requests that are running at
+// the same moment (for example React's double render in development) share one call.
+// Nothing is kept once the request finishes, so results never go stale.
+function fetchJson(url) {
+  if (inFlight.has(url)) return inFlight.get(url);
+
+  const request = (async () => {
+    const response = await fetchWithRetry(url);
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`Ticketmaster API error ${response.status}: ${errorBody}`);
+    }
+
+    return response.json();
+  })().finally(() => inFlight.delete(url));
+
+  inFlight.set(url, request);
+  return request;
+}
+
+// Clears the spacing and in-flight state. Only used by tests.
+export function resetRateLimiter() {
+  nextSlotAt = 0;
+  inFlight.clear();
+}
+
 // Feature flag: set FEATURE_EVENT_CACHE=true to reuse identical search results
 // for a few minutes instead of calling Ticketmaster every time. Off by default.
 // Still unfinished, which is why it stays off: there is no size limit, expired
@@ -86,14 +164,7 @@ export async function searchEvents(params = {}) {
     }
   }
 
-  const response = await fetchWithTimeout(url);
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Ticketmaster API error ${response.status}: ${errorBody}`);
-  }
-
-  const data = await response.json();
+  const data = await fetchJson(url);
 
   // Ticketmaster returns _embedded.events when there are results,
   // or no _embedded at all when there are none.
@@ -122,14 +193,7 @@ export async function searchEvents(params = {}) {
 export async function getEventById(eventId) {
   const url = `${TM_BASE_URL}/events/${eventId}.json?apikey=${process.env.TICKETMASTER_API_KEY}`;
 
-  const response = await fetchWithTimeout(url);
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Ticketmaster API error ${response.status}: ${errorBody}`);
-  }
-
-  const data = await response.json();
+  const data = await fetchJson(url);
   return formatEvent(data);
 }
 
