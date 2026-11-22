@@ -8,6 +8,7 @@ import savedRoutes from './routes/saved.js';
 import pool from './db.js';
 import { startCleanupSchedule } from './services/cleanup.js';
 import onboardingRoutes from './routes/onboarding.js';
+import { metrics } from './utils/telemetry.js';
 
 dotenv.config();
 
@@ -24,6 +25,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/events/saved', savedRoutes);  // must come before /api/events (has /:id param)
 app.use('/api/events', eventRoutes);
+
+// Telemetry: shows Ticketmaster call and failure counts
+app.get('/api/metrics', (req, res) => res.json(metrics));
 
 // Start server
 app.listen(PORT, () => {

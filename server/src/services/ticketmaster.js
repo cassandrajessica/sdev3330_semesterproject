@@ -1,3 +1,5 @@
+import { metrics } from '../utils/telemetry.js';
+
 const TM_BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
 
 // Stop waiting for Ticketmaster after this many ms so a slow API can't hang a request.
@@ -79,14 +81,33 @@ function fetchJson(url) {
   if (inFlight.has(url)) return inFlight.get(url);
 
   const request = (async () => {
-    const response = await fetchWithRetry(url);
+    const start = Date.now();        // timer for this request
+    metrics.ticketmasterCalls++;     // counter: total Ticketmaster calls
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Ticketmaster API error ${response.status}: ${errorBody}`);
+    try {
+      const response = await fetchWithRetry(url);
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Ticketmaster API error ${response.status}: ${errorBody}`);
+      }
+
+      return await response.json();
+    } catch (err) {
+      metrics.ticketmasterFailures++; // counter: failed Ticketmaster calls
+
+      // Log statement. The URL is left out on purpose because it contains the API key.
+      console.error(JSON.stringify({
+        level: 'error',
+        event: 'ticketmaster_fetch_failed',
+        error: err.message,
+        duration_ms: Date.now() - start,
+        total_calls: metrics.ticketmasterCalls,
+        total_failures: metrics.ticketmasterFailures,
+      }));
+
+      throw err;
     }
-
-    return response.json();
   })().finally(() => inFlight.delete(url));
 
   inFlight.set(url, request);
