@@ -7,6 +7,7 @@ import ResetPassword from './pages/ResetPassword.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import CategoryPage from './pages/CategoryPage.jsx';
 import SavedEventsPage from './pages/SavedEventsPage.jsx';
+import PreferencesPage from './pages/PreferencesPage.jsx';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
           <Route path="/saved" element={<SavedEventsPage />} />
+          <Route path="/preferences" element={<PreferencesPage />} />
         </Routes>
       </BrowserRouter>
     </GoogleOAuthProvider>

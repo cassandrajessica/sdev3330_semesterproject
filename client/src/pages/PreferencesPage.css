@@ -1,0 +1,89 @@
+.prefs-hero {
+  border-radius: var(--radius-lg);
+  padding: 32px 56px 40px;
+  background: var(--alabaster-grey);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.prefs-hero__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+  text-decoration: none;
+  margin-bottom: 28px;
+}
+
+.prefs-hero__back:hover {
+  text-decoration: underline;
+}
+
+.prefs-hero h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+  line-height: 1.1;
+}
+
+.prefs-hero p {
+  font-size: 1rem;
+  max-width: 46ch;
+}
+
+.prefs-skeleton {
+  height: 320px;
+  margin-top: 32px;
+}
+
+.prefs-form {
+  margin-top: 32px;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+}
+
+.prefs-field {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prefs-field legend {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+
+.prefs-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.prefs-input {
+  width: 160px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--alabaster-grey);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.prefs-input:focus {
+  outline: none;
+  border-color: var(--peach-glow);
+}
+
+@media (max-width: 640px) {
+  .prefs-hero { padding: 28px 24px 32px; }
+}
