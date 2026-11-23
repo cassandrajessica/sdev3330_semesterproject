@@ -4,8 +4,11 @@ import Layout from '../components/Layout.jsx';
 import Carousel from '../components/Carousel.jsx';
 import EventGrid from '../components/EventGrid.jsx';
 import PopularCarousel from '../components/PopularCarousel.jsx';
+import RecommendedCarousel from '../components/RecommendedCarousel.jsx';
 import LocationPicker from '../components/LocationPicker.jsx';
 import { ArrowRight, CloseIcon, CrosshairIcon } from '../components/Icons.jsx';
+import useFlags from '../hooks/useFlags.js';
+import usePreferences from '../hooks/usePreferences.js';
 import useSavedEvents, { useSaveHandler } from '../hooks/useSavedEvents.js';
 import useUserLocation from '../hooks/useUserLocation.js';
 import { CATEGORIES } from '../utils/categories.js';
@@ -18,6 +21,12 @@ function Dashboard() {
   const saved = useSavedEvents();
   const handleToggleSave = useSaveHandler(saved, navigate);
   const loc = useUserLocation();
+
+  // Onboarding feature flag: preferences banner and "Recommended For You"
+  const { flags } = useFlags();
+  const onboardingOn = !!flags.onboarding && !!saved.user;
+  const prefs = usePreferences(onboardingOn);
+  const [hidePrefsPrompt, setHidePrefsPrompt] = useState(false);
 
   // Filters for the Events grid (categories live on their own pages now)
   const [keyword, setKeyword] = useState('');
@@ -61,6 +70,7 @@ function Dashboard() {
 
   const gridParams = { ...loc.params, venueId: venue?.id, keyword };
   const showPrompt = !loc.location.chosen && !hidePrompt;
+  const showPrefsPrompt = onboardingOn && !prefs.loading && !prefs.preferences && !hidePrefsPrompt;
 
   return (
     <Layout saved={saved} onSearch={handleSearch}>
@@ -90,6 +100,21 @@ function Dashboard() {
         </div>
       )}
 
+      {/* Onboarding flag on, but no preferences saved yet */}
+      {showPrefsPrompt && (
+        <div className="loc-prompt" role="region" aria-label="Preferences">
+          <p>
+            <strong>Get events picked for you.</strong> Tell us your ZIP code, how far you&rsquo;ll travel and what you like.
+          </p>
+          <Link to="/preferences" className="pill-btn pill-btn--dark">
+            Set preferences
+          </Link>
+          <button type="button" className="loc-prompt__close" onClick={() => setHidePrefsPrompt(true)} aria-label="Not now">
+            <CloseIcon width={18} height={18} />
+          </button>
+        </div>
+      )}
+
       {/* Explore By Category: each tile opens that category's page */}
       <section className="dash-section" id="categories">
         <h2 className="dash-heading dash-heading--center">Explore By Category</h2>
@@ -102,6 +127,10 @@ function Dashboard() {
           ))}
         </div>
       </section>
+
+      {onboardingOn && prefs.preferences && (
+        <RecommendedCarousel preferences={prefs.preferences} saved={saved} onToggleSave={handleToggleSave} />
+      )}
 
       <PopularCarousel title="Popular Events" id="popular" params={loc.params} saved={saved} onToggleSave={handleToggleSave} />
 

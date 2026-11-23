@@ -44,6 +44,17 @@
   margin-bottom: 24px;
 }
 
+.dash-subtitle {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.dash-subtitle a {
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
 .dash-section__head--wrap {
   justify-content: flex-start;
   flex-wrap: wrap;

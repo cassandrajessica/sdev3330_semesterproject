@@ -2,7 +2,8 @@ import { useRef } from 'react';
 import { ArrowLeft, ArrowRight } from './Icons.jsx';
 
 // A titled row that scrolls sideways, with the round arrow buttons from the mockup.
-function Carousel({ title, id, children, empty }) {
+// "subtitle" is optional extra content shown under the title (text or links).
+function Carousel({ title, id, children, empty, subtitle }) {
   const trackRef = useRef(null);
 
   function scrollBy(direction) {
@@ -15,7 +16,10 @@ function Carousel({ title, id, children, empty }) {
   return (
     <section className="dash-section" id={id} aria-label={title}>
       <div className="dash-section__head">
-        <h2 className="dash-heading">{title}</h2>
+        <div>
+          <h2 className="dash-heading">{title}</h2>
+          {subtitle && <p className="dash-subtitle">{subtitle}</p>}
+        </div>
         <div className="carousel-arrows">
           <button type="button" className="round-btn" onClick={() => scrollBy(-1)} aria-label={`Scroll ${title} left`}>
             <ArrowLeft />

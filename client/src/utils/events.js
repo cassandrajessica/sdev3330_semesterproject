@@ -75,3 +75,23 @@ export function cardLabel(event) {
 export function panelLabel(event) {
   return [usable(event.category), usable(event.genre)].filter(Boolean).join(' · ') || null;
 }
+
+// Combines several lists of search results (one per favorite category) into
+// one list. Takes events from each list in turn so every category shows up
+// near the front, skips duplicates, and stops at the limit.
+export function mergeRecommendations(lists, limit = 12) {
+  const seen = new Set();
+  const merged = [];
+  const longest = Math.max(0, ...lists.map((l) => l.length));
+  for (let i = 0; i < longest && merged.length < limit; i++) {
+    for (const list of lists) {
+      const event = list[i];
+      if (event && !seen.has(event.ticketmaster_id)) {
+        seen.add(event.ticketmaster_id);
+        merged.push(event);
+        if (merged.length === limit) break;
+      }
+    }
+  }
+  return merged;
+}

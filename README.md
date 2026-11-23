@@ -116,7 +116,13 @@ Flags are environment variables in `server/.env`. Anything other than `true` cou
 | Flag | Default | What it does |
 |---|---|---|
 | `FEATURE_EVENT_CACHE` | off | Reuses identical Ticketmaster search results for 5 minutes instead of calling the API again. Work in progress: no size limit or cleanup yet. |
-| `FEATURE_ONBOARDING` | off | Onboarding step where new users pick preferred categories. Work in progress: preferences are validated but not saved, no UI yet. |
+| `FEATURE_ONBOARDING` | off | Signed-in users set a home ZIP code, travel radius and favorite categories on `/preferences`, and the dashboard shows a "Recommended For You" section. Can be flipped at runtime (see below). |
+
+### Flipping the onboarding flag without a redeploy
+
+Run `server/migrations/002_onboarding.sql` once in the Supabase SQL editor. It creates the `user_preferences` table and a `feature_flags` table with an `onboarding` row (off).
+
+The server checks that row on every request, so changing `enabled` in the Supabase table editor turns the feature on or off right away. Refresh the site to see the change; nothing is rebuilt or restarted. If the row is missing or the database can't be reached, the server falls back to `FEATURE_ONBOARDING` in `server/.env`. The client reads the current value from `GET /api/flags`.
 
 ## License
 
